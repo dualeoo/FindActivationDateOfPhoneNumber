@@ -1,19 +1,16 @@
 import csv
-import math
 from datetime import datetime
 from typing import Dict
 
 PATH_TO_RESULT = "result.csv"
-
-
-# Note the time complexity of the whole program is O(2n)
 ERROR_MESSAGE_WHEN_CANNOT_FIND_LAST_ACTIVATION_DATE = "Huhm! Weird! How can it is possible that all starting date has a corresponding ending date. " \
     "It must be the case that there always exist one starting date without a corresponding ending date!"
-
-
 BIT_MASK_FOR_ENDING_DATE = 0b10
 BIT_MASK_FOR_STARTING_DATE = 0b01
 ERROR_MESSAGE_WHEN_DUPLICATION_OCCURS = "Something weird happen. How comes existing two records with same {}?"
+
+
+# Note the time complexity of the whole program is O(2n) and space complexity is O(n)
 def is_starting_date_already_exist(date_nature):
     return date_nature & BIT_MASK_FOR_STARTING_DATE != 0
 
@@ -35,7 +32,7 @@ def check_date_user_supply_valid(date_nature, is_starting_date):
 class PhoneNumber:
     def __init__(self, phone_number: str) -> None:
         self.phone_number = phone_number
-        # Note number of phone numbers [1; n]. Assuming average = 0.5n
+        # Note number of phone numbers [1; n].
         self.date_dictionary = dict()
         # Note observation: number_of_date_added_so_far is approximately equal to number_of_record_in_input_file
         # assume two of them are equal to make further calculation
@@ -75,10 +72,10 @@ class PhoneNumber:
                 self.date_dictionary[date_user_supply] = BIT_MASK_FOR_ENDING_DATE
             self.number_of_date_added_so_far += 1
 
-    # Note takes O(number_of_date_added_so_far)
+    # Note takes O(number_of_date_added_so_far) in time
     def find_last_activation_dates(self) -> datetime:
         max_date = None
-        # Note takes O(number_of_date_added_so_far)
+        # Note takes O(number_of_date_added_so_far) in time
         for date, date_nature in self.date_dictionary.items():
             if date_nature == BIT_MASK_FOR_STARTING_DATE:
                 if max_date and date > max_date:
@@ -135,7 +132,7 @@ class FindLastActivationDate:
             # this method takes:
             # SUM(i_frst=0, i_last=number_of_phone_numbers, number_of_date_added_so_far) ~=
             # SUM(i_frst=0, i_last=number_of_phone_numbers, number_of_record_in_input_file) = n
-            # NOTE Therefore, time complexity of this method is O(n)
+            # Therefore, time complexity of this method is O(n)
             # TODOx checking my assumption
             for phone_number, phone_number_object in self.phone_numbers.items():
                 # TODOx check time complexity of this method
