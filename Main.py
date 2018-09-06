@@ -56,14 +56,16 @@ class PhoneNumber:
         # 0b11 (both)
         if date_user_supply is None:
             return
+        # Note access elements in dict takes O(c)
         date_nature = self.date_dictionary.get(date_user_supply)
 
         if date_nature:
             check_date_user_supply_valid(date_nature, is_activation_date)
             if is_activation_date:
-                date_nature += BIT_MASK_FOR_STARTING_DATE
+                # Note modify the value corresponding with the key takes O(c) time
+                self.date_dictionary[date_user_supply] += BIT_MASK_FOR_STARTING_DATE
             else:
-                date_nature += BIT_MASK_FOR_ENDING_DATE
+                self.date_dictionary[date_user_supply] += BIT_MASK_FOR_ENDING_DATE
         else:
             if is_activation_date:
                 # Note allocate O(c) memory
@@ -108,7 +110,7 @@ class FindLastActivationDate:
             reader = csv.reader(f, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
             if self.containing_header:
                 next(reader)
-            # Note this takes O(n) time, O(n) memory
+            # Note this takes O(n) time, O(2n) memory
             for record in reader:
                 phone_number = record[0]
                 # TODOx check month format
