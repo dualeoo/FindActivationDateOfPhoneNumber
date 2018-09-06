@@ -3,8 +3,9 @@ from datetime import datetime
 from typing import Dict
 
 PATH_TO_RESULT = "result.csv"
-ERROR_MESSAGE_WHEN_CANNOT_FIND_LAST_ACTIVATION_DATE = "Huhm! Weird! How can it is possible that all starting date has a corresponding ending date. " \
-    "It must be the case that there always exist one starting date without a corresponding ending date!"
+ERROR_MESSAGE_WHEN_CANNOT_FIND_LAST_ACTIVATION_DATE = "Huhm! Weird! How can it is possible that all starting date " \
+                                                      "has a corresponding ending date. " \
+                                                      "It must be the case that there always exist one starting date without a corresponding ending date!"
 BIT_MASK_FOR_ENDING_DATE = 0b10
 BIT_MASK_FOR_STARTING_DATE = 0b01
 ERROR_MESSAGE_WHEN_DUPLICATION_OCCURS = "Something weird happen. How comes existing two records with same {}?"
@@ -140,7 +141,3 @@ class FindLastActivationDate:
                 # TODOx check time complexity of this method
                 last_activation_date = phone_number_object.find_last_activation_dates()
                 writer.writerow([phone_number, last_activation_date])
-
-
-if __name__ == '__main__':
-    FindLastActivationDate("input.csv").run()
