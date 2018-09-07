@@ -14,7 +14,7 @@ The key of this dictionary is a distinct date and the value can either of these 
 
 ### 2. For each phone number, find the newest activation date (PhoneNumber.find_last_activation_date)
 
-We now look at PhoneNumber.date_dictionary of this phone number. 
+We now look at PhoneNumber.date_dictionary of each phone number. 
 For each date in PhoneNumber.date_dictionary, we look for the date with corresponding value =  0b01. Why?
 Obviously we don't care about deactivation date so we don't care those with 0b10. 
 Those with value of 0b11 represents transition from prepaid to postpaid or vice versa.
@@ -24,15 +24,18 @@ Therefore, 0b01 is what we are interested.
 
 ### Time
 
-The whole alogrithm takes O(n) in terms of time. The two key steps of the program is 
+The whole algorithm takes O(n) in terms of time. The two key steps of the program is 
 FindLastActivationDate.initialize_phone_numbers and FindLastActivationDate.run. 
-As these two run sequentially and each takes O(n), the whole algorithm time complexity is O(n)
+As these two run sequentially and each takes O(n), the whole algorithm time complexity is O(n).
+Please refer to comment throughout the code for detailed proof of these two statements:
+- Time complexity of FindLastActivationDate.initialize_phone_numbers is O(n)
+- Time complexity of FindLastActivationDate.run is O(n)
 
 ### Space
 
 The whole algorithm takes O(n) in terms of space. 
 FindLastActivationDate.initialize_phone_numbers allocates O(n) memory while 
-FindLastActivationDate.run does not allocate any.
+FindLastActivationDate.run allocates O(c).
 Therefore, the whole algorithm space complexity is O(n).
 
 ### Data structure processing time
