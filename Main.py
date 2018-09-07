@@ -2,10 +2,9 @@ import csv
 from datetime import datetime
 from typing import Dict
 
+DEFAULT_PHONE_NUM_FORMAT = "%Y-%m-%d"
+
 PATH_TO_RESULT = "result.csv"
-ERROR_MESSAGE_WHEN_CANNOT_FIND_LAST_ACTIVATION_DATE = "Huhm! Weird! How can it is possible that all starting date " \
-                                                      "has a corresponding ending date. " \
-                                                      "It must be the case that there always exist one starting date without a corresponding ending date!"
 BIT_MASK_FOR_ENDING_DATE = 0b10
 BIT_MASK_FOR_STARTING_DATE = 0b01
 ERROR_MESSAGE_WHEN_DUPLICATION_OCCURS = "Something weird happen. How comes existing two records with same {}?"
@@ -31,7 +30,9 @@ def check_date_user_supply_valid(date_nature, is_starting_date):
 
 
 class PhoneNumber:
-    def __init__(self, phone_number: str) -> None:
+    # fixmeX passing phone_num_format to constructor
+    def __init__(self, phone_number: str, phone_num_format) -> None:
+        self.phone_num_format = phone_num_format
         self.phone_number = phone_number
         # Note number of phone numbers [1; n].
         self.date_dictionary = dict()
@@ -43,10 +44,21 @@ class PhoneNumber:
 
     # Note this method allocate O(c) memory
     def add_record(self, record):
-        activation_date = datetime.strptime(record[1], "%Y-%m-%d")
-        deactivation_date = datetime.strptime(record[2], "%Y-%m-%d")
+        activation_date = record[1]
+        deactivation_date = record[2]
+
+        if not activation_date:
+            raise Exception("Strange! Activation date of {} is null. "
+                            "Only deactivation date can be null."
+                            "Please check the data again before running the program.".format(self.phone_number))
+
+        activation_date = datetime.strptime(activation_date, self.phone_num_format)
         self.add_date(activation_date, True)
-        self.add_date(deactivation_date, False)
+
+        if deactivation_date:
+            deactivation_date = datetime.strptime(deactivation_date, self.phone_num_format)
+            self.add_date(deactivation_date, False)
+
         self.number_of_record_in_input_file += 1
 
     # Note this method allocate O(c) memory if date_nature = None, else not allocate new memory
@@ -55,7 +67,7 @@ class PhoneNumber:
         # 0b01 (if the date is starting date),
         # 0b10 (ending date),
         # 0b11 (both)
-        if date_user_supply is None:
+        if not date_user_supply:
             return
         # Note access elements in dict takes O(c)
         date_nature = self.date_dictionary.get(date_user_supply)
@@ -98,7 +110,8 @@ class PhoneNumber:
 class FindLastActivationDate:
 
     def __init__(self, path_to_file_containing_phone_number: str, containing_header=True,
-                 path_to_result: str=PATH_TO_RESULT) -> None:
+                 path_to_result: str = PATH_TO_RESULT, phone_num_format=DEFAULT_PHONE_NUM_FORMAT) -> None:
+        self.phone_num_format = phone_num_format
         self.path_to_file_containing_phone_number = path_to_file_containing_phone_number
         self.containing_header = containing_header
         self.path_to_result = path_to_result
@@ -115,9 +128,9 @@ class FindLastActivationDate:
             for record in reader:
                 phone_number = record[0]
                 # TODOx check month format
-                if not phone_numbers[phone_number]:
+                if not phone_numbers.get(phone_number):
                     #  Note memory allocate O(c) here
-                    phone_numbers[phone_number] = PhoneNumber(phone_number)
+                    phone_numbers[phone_number] = PhoneNumber(phone_number, self.phone_num_format)
                 phone_number_object = phone_numbers[phone_number]
                 # TODOx check time complexity
                 # TODOx check allocate memory
@@ -128,7 +141,7 @@ class FindLastActivationDate:
 
     # Note time complexity of this method is O(n), O(c) memory
     def run(self):
-        with open(self.path_to_result, 'w') as f:
+        with open(self.path_to_result, 'w', newline='') as f:
             writer = csv.writer(f, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
             writer.writerow(["PHONE_NUMBER", "REAL_ACTIVATION_DATE"])
 
@@ -140,4 +153,4 @@ class FindLastActivationDate:
             for phone_number, phone_number_object in self.phone_numbers.items():
                 # TODOx check time complexity of this method
                 last_activation_date = phone_number_object.find_last_activation_dates()
-                writer.writerow([phone_number, last_activation_date])
+                writer.writerow([phone_number, last_activation_date.strftime(self.phone_num_format)])
